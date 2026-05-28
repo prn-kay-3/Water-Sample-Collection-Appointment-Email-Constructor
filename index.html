@@ -10,8 +10,6 @@
     :root {
       --bg:            #131313;
       --bg-card:       #1a1a1a;
-      --bg-input:      #222222;
-      --bg-input-focus:#252525;
       --border:        #2a2a2a;
       --border-focus:  #3e97ea;
       --text:          #e8e8e8;
@@ -20,7 +18,6 @@
       --accent:        #3e97ea;
       --accent2:       #2e46ff;
       --accent-glow:   rgba(62,151,234,0.18);
-      --accent2-glow:  rgba(46,70,255,0.12);
       --radius:        12px;
       --radius-sm:     8px;
       --transition:    0.22s cubic-bezier(0.4,0,0.2,1);
@@ -29,7 +26,6 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -41,319 +37,165 @@
       overflow-x: hidden;
     }
 
-    /* ── Noise overlay ── */
     body::before {
       content: '';
       position: fixed; inset: 0;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
-      opacity: 0.028;
-      pointer-events: none;
-      z-index: 0;
+      opacity: 0.028; pointer-events: none; z-index: 0;
     }
 
-    /* ── Ambient blobs ── */
-    .blob {
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(120px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.07;
-      animation: drift 18s ease-in-out infinite alternate;
-    }
-    .blob-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -150px; animation-delay: 0s; }
+    .blob { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; opacity: 0.07; animation: drift 18s ease-in-out infinite alternate; }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent); top: -200px; left: -150px; }
     .blob-2 { width: 500px; height: 500px; background: var(--accent2); bottom: -100px; right: -100px; animation-delay: -6s; }
     @keyframes drift { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(30px,40px) scale(1.1)} }
 
-    /* ── Layout ── */
-    .wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 20px 60px;
-    }
+    .wrapper { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 20px 60px; }
 
-    /* ── Header ── */
-    header {
-      padding: 48px 0 36px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      animation: fadeUp 0.5s ease both;
-    }
-    .logo-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-mark {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 800; color: #fff;
-      letter-spacing: -1px;
-      flex-shrink: 0;
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
+    /* Header */
+    header { padding: 48px 0 36px; display: flex; flex-direction: column; gap: 8px; animation: fadeUp 0.5s ease both; }
+    .logo-row { display: flex; align-items: center; gap: 12px; }
+    .logo-mark { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; color: #fff; flex-shrink: 0; box-shadow: 0 0 20px var(--accent-glow); }
     .logo-text { font-size: 13px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.12em; text-transform: uppercase; }
     h1 { font-size: clamp(22px, 5vw, 34px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
     h1 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 400; }
 
-    /* ── Grid ── */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 16px;
-      animation: fadeUp 0.5s 0.1s ease both;
-    }
+    /* Grid */
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; animation: fadeUp 0.5s 0.1s ease both; }
     @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
-    /* ── Card ── */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      transition: border-color var(--transition), box-shadow var(--transition);
-    }
-    .card:focus-within {
-      border-color: var(--border-focus);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
+    /* Card */
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: visible; transition: border-color var(--transition), box-shadow var(--transition); }
+    .card:focus-within { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--accent-glow); }
     .card.full { grid-column: 1 / -1; }
 
-    /* ── Field ── */
+    /* Field */
     .field { padding: 16px 18px; }
-    label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      transition: color var(--transition);
-    }
+    label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; transition: color var(--transition); }
     .card:focus-within label { color: var(--accent); }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="date"] {
-      width: 100%;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: var(--font-ui);
-      font-size: 15px;
-      font-weight: 600;
-      padding: 0;
-      min-height: 28px;
-      transition: color var(--transition);
+    input[type="text"], input[type="email"] {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: var(--font-ui); font-size: 15px; font-weight: 600;
+      padding: 0; min-height: 28px; transition: color var(--transition);
     }
     input::placeholder { color: var(--text-dim); font-weight: 400; }
-    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
 
-    /* ── CC tags ── */
-    .tag-input-wrapper {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
+    /* ── Native date picker styled ── */
+    .date-field-wrapper { position: relative; }
+    input[type="date"] {
+      width: 100%; background: transparent; border: none; outline: none;
+      color: var(--text); font-family: var(--font-ui); font-size: 15px; font-weight: 600;
+      padding: 0; min-height: 28px; cursor: pointer;
+      color-scheme: dark;
     }
-    .tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      background: linear-gradient(135deg, rgba(62,151,234,0.15), rgba(46,70,255,0.12));
-      border: 1px solid rgba(62,151,234,0.3);
-      border-radius: 20px;
-      padding: 3px 10px 3px 12px;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      color: var(--accent);
-      animation: tagIn 0.2s ease;
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.45) sepia(1) saturate(3) hue-rotate(180deg);
+      cursor: pointer; opacity: 0.7; margin-left: 4px;
     }
-    @keyframes tagIn { from { opacity:0; transform: scale(0.85); } to { opacity:1; transform: scale(1); } }
-    .tag-remove {
-      background: none; border: none; cursor: pointer;
-      color: var(--accent); opacity: 0.6;
-      font-size: 14px; line-height: 1;
-      padding: 0; min-width: 16px; height: 16px;
-      display: flex; align-items: center; justify-content: center;
-      border-radius: 50%;
-      transition: opacity var(--transition), background var(--transition);
+    input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+    .date-display {
+      font-size: 15px; font-weight: 600; color: var(--text);
+      pointer-events: none; position: absolute; top: 0; left: 0;
+      min-height: 28px; display: flex; align-items: center;
+      background: var(--bg-card); padding-right: 8px;
+      /* covers the raw date value with friendly format */
     }
+    .date-display.empty { color: var(--text-dim); font-weight: 400; }
+
+    /* CC tags */
+    .tag-input-wrapper { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, rgba(62,151,234,0.15), rgba(46,70,255,0.12)); border: 1px solid rgba(62,151,234,0.3); border-radius: 20px; padding: 3px 10px 3px 12px; font-size: 12px; font-family: var(--font-mono); color: var(--accent); animation: tagIn 0.2s ease; }
+    @keyframes tagIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+    .tag-remove { background: none; border: none; cursor: pointer; color: var(--accent); opacity: 0.6; font-size: 14px; line-height: 1; padding: 0; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: opacity var(--transition), background var(--transition); }
     .tag-remove:hover { opacity: 1; background: rgba(62,151,234,0.2); }
-    .tag-input {
-      background: transparent; border: none; outline: none;
-      color: var(--text); font-family: var(--font-ui);
-      font-size: 14px; font-weight: 500;
-      min-width: 180px; flex: 1;
-      min-height: 28px;
-    }
+    .tag-input { background: transparent; border: none; outline: none; color: var(--text); font-family: var(--font-ui); font-size: 14px; font-weight: 500; min-width: 180px; flex: 1; min-height: 28px; }
     .tag-input::placeholder { color: var(--text-dim); font-weight: 400; }
-    .tag-hint {
-      font-size: 11px; color: var(--text-dim);
-      padding: 6px 0 0;
-      font-style: italic;
-    }
+    .tag-hint { font-size: 11px; color: var(--text-dim); padding: 6px 0 0; font-style: italic; }
 
-    /* ── Divider ── */
-    .section-label {
-      font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-      text-transform: uppercase; color: var(--text-dim);
-      margin: 28px 0 12px;
-      display: flex; align-items: center; gap: 12px;
-      animation: fadeUp 0.5s 0.15s ease both;
-    }
+    /* Section label */
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-dim); margin: 28px 0 12px; display: flex; align-items: center; gap: 12px; animation: fadeUp 0.5s 0.15s ease both; }
     .section-label::after { content:''; flex:1; height:1px; background: var(--border); }
 
-    /* ── Preview card ── */
-    .preview-card {
+    /* Preview card */
+    .preview-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; animation: fadeUp 0.5s 0.2s ease both; }
+    .preview-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .preview-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .preview-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-family: var(--font-ui); font-size: 13px; font-weight: 700; letter-spacing: 0.03em; transition: all var(--transition); min-height: 38px; white-space: nowrap; }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; box-shadow: 0 4px 20px rgba(62,151,234,0.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(62,151,234,0.45); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+    .btn-success { background: transparent; color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+
+    /* Email meta */
+    .email-meta { padding: 0 20px; }
+    .meta-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-key { font-family: var(--font-mono); font-size: 11px; font-weight: 500; color: var(--text-muted); letter-spacing: 0.06em; min-width: 60px; padding-top: 2px; flex-shrink: 0; }
+    .meta-val { color: var(--text); word-break: break-all; flex: 1; line-height: 1.5; }
+    .meta-val .placeholder-text { color: var(--text-dim); font-style: italic; }
+
+    /* Email body */
+    .email-body { padding: 20px; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 13px; line-height: 1.85; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+    .highlight { background: linear-gradient(135deg, rgba(62,151,234,0.15), rgba(46,70,255,0.12)); color: var(--accent); padding: 1px 5px; border-radius: 4px; font-weight: 500; }
+    .empty-placeholder { color: var(--text-dim); font-style: italic; }
+
+    /* ── Admin note card ── */
+    .admin-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      animation: fadeUp 0.5s 0.2s ease both;
-    }
-    .preview-header {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .preview-title {
-      font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; color: var(--text-muted);
-    }
-    .preview-actions { display: flex; gap: 8px; }
-
-    /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 9px 16px;
-      border-radius: var(--radius-sm);
-      border: none; cursor: pointer;
-      font-family: var(--font-ui); font-size: 13px; font-weight: 700;
-      letter-spacing: 0.03em;
-      transition: all var(--transition);
-      min-height: 38px;
-      white-space: nowrap;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(62,151,234,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(62,151,234,0.45); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
-
-    /* ── Email meta row (To/CC/Subject) ── */
-    .email-meta { padding: 0 20px; }
-    .meta-row {
-      display: flex; align-items: flex-start; gap: 10px;
-      padding: 11px 0;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-    }
-    .meta-row:last-child { border-bottom: none; }
-    .meta-key {
-      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
-      color: var(--text-muted); letter-spacing: 0.06em;
-      min-width: 60px; padding-top: 2px;
-      flex-shrink: 0;
-    }
-    .meta-val {
-      color: var(--text); word-break: break-all; flex: 1; line-height: 1.5;
-    }
-    .meta-val .placeholder-text { color: var(--text-dim); font-style: italic; }
-
-    /* ── Email body ── */
-    .email-body {
-      padding: 20px;
-      border-top: 1px solid var(--border);
-      font-family: var(--font-mono);
-      font-size: 13px;
-      line-height: 1.85;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .highlight {
-      background: linear-gradient(135deg, rgba(62,151,234,0.15), rgba(46,70,255,0.12));
-      color: var(--accent);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-weight: 500;
-    }
-    .empty-placeholder {
-      color: var(--text-dim);
-      font-style: italic;
-    }
-
-    /* ── Copy feedback ── */
-    .copy-toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-      background: var(--accent); color: #fff;
-      padding: 10px 20px; border-radius: 20px;
-      font-size: 13px; font-weight: 700; letter-spacing: 0.05em;
-      opacity: 0; pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 100;
-      box-shadow: 0 4px 20px rgba(62,151,234,0.5);
-    }
-    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── Open in mail big button ── */
-    .open-mail-btn {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      width: 100%;
-      padding: 16px;
-      border-radius: var(--radius-sm);
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      border: none; cursor: pointer;
-      font-family: var(--font-ui); font-size: 15px; font-weight: 700;
-      letter-spacing: 0.02em;
-      transition: all var(--transition);
-      min-height: 52px;
-      box-shadow: 0 4px 24px rgba(62,151,234,0.3);
       margin-top: 16px;
       animation: fadeUp 0.5s 0.25s ease both;
     }
+    .admin-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+    }
+    .admin-title-wrap { display: flex; align-items: center; gap: 8px; }
+    .admin-badge {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      background: rgba(255,170,0,0.12); color: #ffaa00;
+      border: 1px solid rgba(255,170,0,0.25); border-radius: 20px;
+      padding: 2px 8px;
+    }
+    .admin-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+    .admin-body {
+      padding: 16px 20px;
+      font-family: var(--font-mono); font-size: 13px; color: var(--text);
+      line-height: 1.6;
+    }
+    .admin-body .highlight { background: rgba(255,170,0,0.1); color: #ffaa00; }
+
+    /* Open mail button */
+    .open-mail-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; cursor: pointer; font-family: var(--font-ui); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; transition: all var(--transition); min-height: 52px; box-shadow: 0 4px 24px rgba(62,151,234,0.3); margin-top: 16px; animation: fadeUp 0.5s 0.3s ease both; }
     .open-mail-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(62,151,234,0.45); }
     .open-mail-btn:active { transform: translateY(0); }
 
-    /* ── Animations ── */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* Toast */
+    .copy-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 100; box-shadow: 0 4px 20px rgba(62,151,234,0.5); }
+    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── Scrollbar ── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
-    /* ── Responsive tweaks ── */
     @media (max-width: 480px) {
       .wrapper { padding: 0 14px 48px; }
       header { padding: 32px 0 24px; }
-      .email-body { font-size: 12px; padding: 16px; }
-      .preview-header { padding: 12px 16px; }
-      .email-meta { padding: 0 16px; }
-      .btn { padding: 9px 12px; font-size: 12px; }
+      .email-body, .admin-body { font-size: 12px; padding: 14px 16px; }
+      .preview-header, .admin-header { padding: 12px 14px; }
+      .email-meta { padding: 0 14px; }
+      .btn { padding: 9px 11px; font-size: 12px; }
     }
   </style>
 </head>
@@ -373,7 +215,7 @@
     <p class="subtitle">Fill in the fields below — your email updates in real-time.</p>
   </header>
 
-  <!-- ── Inputs ── -->
+  <!-- Inputs -->
   <div class="grid">
 
     <div class="card">
@@ -389,7 +231,7 @@
         <div class="tag-input-wrapper" id="cc-tags-container">
           <input type="text" class="tag-input" id="cc-input" placeholder="Add email, press Enter or comma" autocomplete="off" />
         </div>
-        <p class="tag-hint">Press Enter or , to add • Backspace to remove last</p>
+        <p class="tag-hint">Press Enter or , to add &nbsp;·&nbsp; Backspace to remove last</p>
       </div>
     </div>
 
@@ -407,27 +249,31 @@
       </div>
     </div>
 
+    <!-- Date picker — full width -->
     <div class="card full">
       <div class="field">
         <label for="visit-date">Visit Date</label>
-        <input type="text" id="visit-date" placeholder="e.g. Monday 2nd June 2025" autocomplete="off" />
+        <div class="date-field-wrapper">
+          <input type="date" id="visit-date" />
+          <div class="date-display empty" id="date-display">Select a date…</div>
+        </div>
       </div>
     </div>
 
   </div>
 
-  <!-- ── Preview ── -->
-  <div class="section-label">Live Preview</div>
+  <!-- Email Preview -->
+  <div class="section-label">📧 Email Preview</div>
 
   <div class="preview-card">
     <div class="preview-header">
-      <span class="preview-title">📧 Email Preview</span>
+      <span class="preview-title">Composed Email</span>
       <div class="preview-actions">
-        <button class="btn btn-ghost" id="copy-body-btn" title="Copy body text">
+        <button class="btn btn-ghost" id="copy-body-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           Copy Body
         </button>
-        <button class="btn btn-ghost" id="copy-all-btn" title="Copy all fields">
+        <button class="btn btn-ghost" id="copy-all-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
           Copy All
         </button>
@@ -445,11 +291,28 @@
       </div>
       <div class="meta-row">
         <span class="meta-key">Subject</span>
-        <span class="meta-val" id="preview-subject"><span class="placeholder-text">—</span></span>
+        <span class="meta-val" id="preview-subject">Water Sample Collection - Cairn Letting</span>
       </div>
     </div>
 
     <div class="email-body" id="preview-body"></div>
+  </div>
+
+  <!-- Admin Note -->
+  <div class="section-label">📋 Admin Note</div>
+
+  <div class="admin-card">
+    <div class="admin-header">
+      <div class="admin-title-wrap">
+        <span class="admin-title">Internal Record</span>
+        <span class="admin-badge">Admin Only</span>
+      </div>
+      <button class="btn btn-ghost" id="copy-admin-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Note
+      </button>
+    </div>
+    <div class="admin-body" id="admin-note"></div>
   </div>
 
   <button class="open-mail-btn" id="open-mail-btn">
@@ -459,50 +322,77 @@
 
 </div>
 
-<div class="copy-toast" id="copy-toast">Copied to clipboard!</div>
+<div class="copy-toast" id="copy-toast">Copied!</div>
 
 <script>
   // ── State ──
   const ccEmails = [];
 
-  // ── DOM refs ──
+  // ── DOM ──
   const toInput       = document.getElementById('to');
   const ccInput       = document.getElementById('cc-input');
   const ccContainer   = document.getElementById('cc-tags-container');
   const propertyInput = document.getElementById('property');
   const tenantInput   = document.getElementById('tenant');
-  const dateInput     = document.getElementById('visit-date');
+  const visitDateInput= document.getElementById('visit-date');
+  const dateDisplay   = document.getElementById('date-display');
 
   const previewTo      = document.getElementById('preview-to');
   const previewCc      = document.getElementById('preview-cc');
   const previewSubject = document.getElementById('preview-subject');
   const previewBody    = document.getElementById('preview-body');
+  const adminNote      = document.getElementById('admin-note');
 
-  const copyBodyBtn = document.getElementById('copy-body-btn');
-  const copyAllBtn  = document.getElementById('copy-all-btn');
-  const openMailBtn = document.getElementById('open-mail-btn');
-  const toast       = document.getElementById('copy-toast');
+  const copyBodyBtn  = document.getElementById('copy-body-btn');
+  const copyAllBtn   = document.getElementById('copy-all-btn');
+  const copyAdminBtn = document.getElementById('copy-admin-btn');
+  const openMailBtn  = document.getElementById('open-mail-btn');
+  const toast        = document.getElementById('copy-toast');
+
+  // ── Date helpers ──
+  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  function formatVisitDate(iso) {
+    // iso = "YYYY-MM-DD" — parse without timezone shift
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return `${DAYS[date.getDay()]} ${d} ${MONTHS[m - 1]}`;
+  }
+
+  function formatToday() {
+    const t = new Date();
+    return `${t.getDate()} ${MONTHS[t.getMonth()]} ${t.getFullYear()}`;
+  }
 
   // ── Helpers ──
-  function hl(val, fallback) {
-    if (val && val.trim()) {
-      const span = document.createElement('span');
-      span.className = 'highlight';
-      span.textContent = val.trim();
-      return span.outerHTML;
-    }
+  function hl(val, fallback, amber) {
+    const cls = amber ? 'highlight amber' : 'highlight';
+    if (val && val.trim()) return `<span class="${cls}">${escHtml(val.trim())}</span>`;
     return fallback ? `<span class="empty-placeholder">${fallback}</span>` : '';
   }
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function plain(val, fallback) { return (val && val.trim()) ? val.trim() : (fallback || ''); }
+  function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
 
-  function plain(val, fallback) {
-    return (val && val.trim()) ? val.trim() : (fallback || '');
-  }
+  // ── Date picker overlay ──
+  visitDateInput.addEventListener('change', () => {
+    const friendly = formatVisitDate(visitDateInput.value);
+    if (friendly) {
+      dateDisplay.textContent = friendly;
+      dateDisplay.classList.remove('empty');
+    } else {
+      dateDisplay.textContent = 'Select a date…';
+      dateDisplay.classList.add('empty');
+    }
+    update();
+  });
 
-  function isValidEmail(e) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
-  }
+  // Click on overlay passes through to native picker
+  dateDisplay.addEventListener('click', () => visitDateInput.showPicker && visitDateInput.showPicker());
 
-  // ── CC Tag logic ──
+  // ── CC Tags ──
   function addCcTag(email) {
     email = email.trim().toLowerCase();
     if (!email) return;
@@ -513,11 +403,10 @@
     }
     if (ccEmails.includes(email)) { ccInput.value = ''; return; }
     ccEmails.push(email);
-
     const tag = document.createElement('div');
     tag.className = 'tag';
     tag.dataset.email = email;
-    tag.innerHTML = `${email}<button class="tag-remove" title="Remove">×</button>`;
+    tag.innerHTML = `${escHtml(email)}<button class="tag-remove" title="Remove">×</button>`;
     tag.querySelector('.tag-remove').addEventListener('click', () => removeCcTag(email));
     ccContainer.insertBefore(tag, ccInput);
     ccInput.value = '';
@@ -533,46 +422,38 @@
   }
 
   ccInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addCcTag(ccInput.value.replace(',', ''));
-    } else if (e.key === 'Backspace' && ccInput.value === '' && ccEmails.length) {
-      removeCcTag(ccEmails[ccEmails.length - 1]);
-    }
+    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addCcTag(ccInput.value.replace(',', '')); }
+    else if (e.key === 'Backspace' && ccInput.value === '' && ccEmails.length) removeCcTag(ccEmails[ccEmails.length - 1]);
   });
-
-  ccInput.addEventListener('blur', () => {
-    if (ccInput.value.trim()) addCcTag(ccInput.value);
+  ccInput.addEventListener('blur', () => { if (ccInput.value.trim()) addCcTag(ccInput.value); });
+  ccInput.addEventListener('input', () => {
+    if (ccInput.value.includes(',')) { ccInput.value.split(',').forEach(p => p.trim() && addCcTag(p)); ccInput.value = ''; }
   });
-
-  ccInput.addEventListener('input', e => {
-    const val = ccInput.value;
-    if (val.includes(',')) {
-      val.split(',').forEach(p => p.trim() && addCcTag(p));
-      ccInput.value = '';
-    }
-  });
-
-  // Allow clicking the card area to focus input
   document.querySelector('.tag-input-wrapper').addEventListener('click', () => ccInput.focus());
 
   // ── Build subject ──
   function buildSubject() {
     const prop = plain(propertyInput.value);
-    return prop
-      ? `${prop} - Water Sample Collection - Cairn Letting`
-      : 'Water Sample Collection - Cairn Letting';
+    return prop ? `${prop} - Water Sample Collection - Cairn Letting` : 'Water Sample Collection - Cairn Letting';
   }
 
-  // ── Build body (plain text) ──
+  // ── Build body plain (omit blank variables entirely) ──
   function buildBodyPlain() {
-    const tenant = plain(tenantInput.value, '[tenant name]');
-    const date   = plain(dateInput.value,   '[date]');
-    return `Good afternoon ${tenant},
+    const tenantVal = plain(tenantInput.value);
+    const dateVal   = formatVisitDate(visitDateInput.value);
+
+    const tenantStr = tenantVal ? tenantVal : '[tenant name]';
+
+    // Date sentence changes based on whether date is set
+    const dateSentence = dateVal
+      ? `As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${dateVal} to collect water samples from your home in order to test the water supply for traces of lead.`
+      : `As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home to collect water samples from your home in order to test the water supply for traces of lead.`;
+
+    return `Good afternoon ${tenantStr},
 
 I hope you are well.
 
-As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${date} to collect water samples from your home in order to test the water supply for traces of lead.
+${dateSentence}
 
 Please could you advise if someone will be home on this date to provide access, or if our technician can access the property using keys from Cairn.
 
@@ -583,85 +464,80 @@ If you have any questions regarding the appointment, please let us know.
 Kind Regards,`;
   }
 
-  // ── Build body (HTML for preview) ──
+  // ── Build body HTML (for preview, with highlights) ──
   function buildBodyHTML() {
-    const tenant = hl(tenantInput.value, '[tenant name]');
-    const date   = hl(dateInput.value,   '[date]');
-    return `Good afternoon ${tenant},
+    const tenantVal = plain(tenantInput.value);
+    const dateVal   = formatVisitDate(visitDateInput.value);
 
-I hope you are well.
+    const tenantH = tenantVal ? `<span class="highlight">${escHtml(tenantVal)}</span>` : `<span class="empty-placeholder">[tenant name]</span>`;
+    const dateH   = dateVal   ? `<span class="highlight">${escHtml(dateVal)}</span>`   : `<span class="empty-placeholder">[date not set]</span>`;
 
-As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${date} to collect water samples from your home in order to test the water supply for traces of lead.
-
-Please could you advise if someone will be home on this date to provide access, or if our technician can access the property using keys from Cairn.
-
-Please note that in order to carry out the lead test, pipes must not be used for at least 6 hours prior to our technician arriving to collect the water samples.
-
-If you have any questions regarding the appointment, please let us know.
-
-Kind Regards,`;
+    return `Good afternoon ${tenantH},\n\nI hope you are well.\n\nAs instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${dateH} to collect water samples from your home in order to test the water supply for traces of lead.\n\nPlease could you advise if someone will be home on this date to provide access, or if our technician can access the property using keys from Cairn.\n\nPlease note that in order to carry out the lead test, pipes must not be used for at least 6 hours prior to our technician arriving to collect the water samples.\n\nIf you have any questions regarding the appointment, please let us know.\n\nKind Regards,`;
   }
 
-  // ── Update preview ──
-  function update() {
-    const toVal  = plain(toInput.value);
-    const ccVal  = ccEmails.join(', ');
-    const subj   = buildSubject();
-    const bodyH  = buildBodyHTML();
+  // ── Build admin note ──
+  function buildAdminNotePlain() {
+    const visitDateFriendly = formatVisitDate(visitDateInput.value) || '[date not set]';
+    const todayFriendly     = formatToday();
+    return `Emailed asking for ${visitDateFriendly} - ${todayFriendly}`;
+  }
 
+  function buildAdminNoteHTML() {
+    const visitDateFriendly = formatVisitDate(visitDateInput.value);
+    const todayFriendly     = formatToday();
+    const dateH  = visitDateFriendly ? `<span class="highlight" style="background:rgba(255,170,0,0.1);color:#ffaa00;">${escHtml(visitDateFriendly)}</span>` : `<span class="empty-placeholder">[date not set]</span>`;
+    const todayH = `<span class="highlight" style="background:rgba(255,170,0,0.1);color:#ffaa00;">${escHtml(todayFriendly)}</span>`;
+    return `Emailed asking for ${dateH} - ${todayH}`;
+  }
+
+  // ── Update ──
+  function update() {
     // To
-    previewTo.innerHTML = toVal
-      ? `<span class="highlight">${toVal}</span>`
-      : '<span class="placeholder-text">—</span>';
+    const toVal = plain(toInput.value);
+    previewTo.innerHTML = toVal ? `<span class="highlight">${escHtml(toVal)}</span>` : '<span class="placeholder-text">—</span>';
 
     // CC
-    if (ccEmails.length) {
-      previewCc.innerHTML = ccEmails.map(e => `<span class="highlight">${e}</span>`).join(' &nbsp;');
-    } else {
-      previewCc.innerHTML = '<span class="placeholder-text">—</span>';
-    }
+    previewCc.innerHTML = ccEmails.length
+      ? ccEmails.map(e => `<span class="highlight">${escHtml(e)}</span>`).join(' &nbsp;')
+      : '<span class="placeholder-text">—</span>';
 
     // Subject
     const propVal = plain(propertyInput.value);
-    if (propVal) {
-      previewSubject.innerHTML = `<span class="highlight">${propVal}</span> - Water Sample Collection - Cairn Letting`;
-    } else {
-      previewSubject.innerHTML = 'Water Sample Collection - Cairn Letting';
-    }
+    previewSubject.innerHTML = propVal
+      ? `<span class="highlight">${escHtml(propVal)}</span> - Water Sample Collection - Cairn Letting`
+      : 'Water Sample Collection - Cairn Letting';
 
     // Body
-    previewBody.innerHTML = bodyH;
+    previewBody.innerHTML = buildBodyHTML();
+
+    // Admin note
+    adminNote.innerHTML = buildAdminNoteHTML();
   }
 
-  // ── Listen to all inputs ──
-  [toInput, propertyInput, tenantInput, dateInput].forEach(el => {
-    el.addEventListener('input', update);
-  });
+  // ── Listeners ──
+  [toInput, propertyInput, tenantInput].forEach(el => el.addEventListener('input', update));
 
-  // ── Copy helpers ──
+  // ── Toast ──
+  let toastTimer;
   function showToast(msg) {
+    clearTimeout(toastTimer);
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2200);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
   }
 
   async function copyText(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch {
+    try { await navigator.clipboard.writeText(text); }
+    catch {
       const ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      return true;
+      ta.value = text; ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
     }
   }
 
   copyBodyBtn.addEventListener('click', async () => {
     await copyText(buildBodyPlain());
-    showToast('Body copied!');
+    showToast('Email body copied!');
   });
 
   copyAllBtn.addEventListener('click', async () => {
@@ -672,14 +548,17 @@ Kind Regards,`;
     showToast('All fields copied!');
   });
 
-  // ── Open in mail ──
+  copyAdminBtn.addEventListener('click', async () => {
+    await copyText(buildAdminNotePlain());
+    showToast('Admin note copied!');
+  });
+
   openMailBtn.addEventListener('click', () => {
     const to      = encodeURIComponent(plain(toInput.value));
     const cc      = encodeURIComponent(ccEmails.join(','));
     const subject = encodeURIComponent(buildSubject());
     const body    = encodeURIComponent(buildBodyPlain());
-    const mailto  = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
-    window.location.href = mailto;
+    window.location.href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
   });
 
   // ── Init ──
