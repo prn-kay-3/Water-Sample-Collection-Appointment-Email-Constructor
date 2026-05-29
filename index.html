@@ -99,7 +99,6 @@
       pointer-events: none; position: absolute; top: 0; left: 0;
       min-height: 28px; display: flex; align-items: center;
       background: var(--bg-card); padding-right: 8px;
-      /* covers the raw date value with friendly format */
     }
     .date-display.empty { color: var(--text-dim); font-weight: 400; }
 
@@ -175,6 +174,15 @@
     }
     .admin-body .highlight { background: rgba(255,170,0,0.1); color: #ffaa00; }
 
+    /* Paste hint pill */
+    .paste-hint {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #3e97ea; background: rgba(62,151,234,0.1); border: 1px solid rgba(62,151,234,0.2);
+      border-radius: 20px; padding: 2px 8px; margin-left: 4px; vertical-align: middle;
+      opacity: 0.8;
+    }
+
     /* Open mail button */
     .open-mail-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border-radius: var(--radius-sm); background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; border: none; cursor: pointer; font-family: var(--font-ui); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; transition: all var(--transition); min-height: 52px; box-shadow: 0 4px 24px rgba(62,151,234,0.3); margin-top: 16px; animation: fadeUp 0.5s 0.3s ease both; }
     .open-mail-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(62,151,234,0.45); }
@@ -227,11 +235,11 @@
 
     <div class="card">
       <div class="field">
-        <label>CC (Multiple Recipients)</label>
+        <label>CC (Multiple Recipients) <span class="paste-hint">✦ paste list</span></label>
         <div class="tag-input-wrapper" id="cc-tags-container">
-          <input type="text" class="tag-input" id="cc-input" placeholder="Add email, press Enter or comma" autocomplete="off" />
+          <input type="text" class="tag-input" id="cc-input" placeholder="Add email, press Enter — or paste a list" autocomplete="off" />
         </div>
-        <p class="tag-hint">Press Enter or , to add &nbsp;·&nbsp; Backspace to remove last</p>
+        <p class="tag-hint">Press Enter or , to add &nbsp;·&nbsp; Paste multiple emails (one per line) &nbsp;·&nbsp; Backspace to remove last</p>
       </div>
     </div>
 
@@ -245,7 +253,7 @@
     <div class="card">
       <div class="field">
         <label for="tenant">Tenant Name</label>
-        <input type="text" id="tenant" placeholder="e.g. Mr & Mrs Smith" autocomplete="off" />
+        <input type="text" id="tenant" placeholder="e.g. Mr & Mrs Smith (optional)" autocomplete="off" />
       </div>
     </div>
 
@@ -354,7 +362,6 @@
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
   function formatVisitDate(iso) {
-    // iso = "YYYY-MM-DD" — parse without timezone shift
     if (!iso) return '';
     const [y, m, d] = iso.split('-').map(Number);
     const date = new Date(y, m - 1, d);
@@ -367,11 +374,6 @@
   }
 
   // ── Helpers ──
-  function hl(val, fallback, amber) {
-    const cls = amber ? 'highlight amber' : 'highlight';
-    if (val && val.trim()) return `<span class="${cls}">${escHtml(val.trim())}</span>`;
-    return fallback ? `<span class="empty-placeholder">${fallback}</span>` : '';
-  }
   function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function plain(val, fallback) { return (val && val.trim()) ? val.trim() : (fallback || ''); }
   function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim()); }
@@ -389,7 +391,6 @@
     update();
   });
 
-  // Click on overlay passes through to native picker
   dateDisplay.addEventListener('click', () => visitDateInput.showPicker && visitDateInput.showPicker());
 
   // ── CC Tags ──
@@ -421,14 +422,47 @@
     update();
   }
 
+  // ── Parse and add multiple emails from a pasted block ──
+  function addEmailsFromText(text) {
+    // Split on newlines, commas, semicolons, tabs, and spaces — covers Excel pastes
+    const candidates = text.split(/[\n\r,;\t]+/).map(s => s.trim()).filter(Boolean);
+    let added = 0;
+    candidates.forEach(candidate => {
+      if (isValidEmail(candidate) && !ccEmails.includes(candidate.toLowerCase())) {
+        addCcTag(candidate);
+        added++;
+      }
+    });
+    return added;
+  }
+
   ccInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addCcTag(ccInput.value.replace(',', '')); }
     else if (e.key === 'Backspace' && ccInput.value === '' && ccEmails.length) removeCcTag(ccEmails[ccEmails.length - 1]);
   });
+
   ccInput.addEventListener('blur', () => { if (ccInput.value.trim()) addCcTag(ccInput.value); });
-  ccInput.addEventListener('input', () => {
-    if (ccInput.value.includes(',')) { ccInput.value.split(',').forEach(p => p.trim() && addCcTag(p)); ccInput.value = ''; }
+
+  // ── Paste handler: detect multi-line / multi-email paste ──
+  ccInput.addEventListener('paste', e => {
+    const pasted = (e.clipboardData || window.clipboardData).getData('text');
+    // If the pasted text contains line breaks, commas, or semicolons — treat as bulk paste
+    if (/[\n\r,;]/.test(pasted)) {
+      e.preventDefault();
+      const added = addEmailsFromText(pasted);
+      if (added > 0) showToast(`${added} email${added > 1 ? 's' : ''} added!`);
+      ccInput.value = '';
+    }
+    // Otherwise let the browser paste normally; the input event will handle comma-splitting
   });
+
+  ccInput.addEventListener('input', () => {
+    if (ccInput.value.includes(',')) {
+      ccInput.value.split(',').forEach(p => p.trim() && addCcTag(p));
+      ccInput.value = '';
+    }
+  });
+
   document.querySelector('.tag-input-wrapper').addEventListener('click', () => ccInput.focus());
 
   // ── Build subject ──
@@ -437,19 +471,31 @@
     return prop ? `${prop} - Water Sample Collection - Cairn Letting` : 'Water Sample Collection - Cairn Letting';
   }
 
-  // ── Build body plain (omit blank variables entirely) ──
-  function buildBodyPlain() {
+  // ── Greeting helper ──
+  // Returns plain-text greeting line
+  function greetingPlain() {
     const tenantVal = plain(tenantInput.value);
-    const dateVal   = formatVisitDate(visitDateInput.value);
+    return tenantVal ? `Good afternoon ${tenantVal},` : 'Hi there,';
+  }
 
-    const tenantStr = tenantVal ? tenantVal : '[tenant name]';
+  // Returns HTML greeting line (with highlight if name present)
+  function greetingHTML() {
+    const tenantVal = plain(tenantInput.value);
+    if (tenantVal) {
+      return `Good afternoon <span class="highlight">${escHtml(tenantVal)}</span>,`;
+    }
+    return `Hi there,`;
+  }
 
-    // Date sentence changes based on whether date is set
+  // ── Build body plain ──
+  function buildBodyPlain() {
+    const dateVal = formatVisitDate(visitDateInput.value);
+
     const dateSentence = dateVal
       ? `As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${dateVal} to collect water samples from your home in order to test the water supply for traces of lead.`
       : `As instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home to collect water samples from your home in order to test the water supply for traces of lead.`;
 
-    return `Good afternoon ${tenantStr},
+    return `${greetingPlain()}
 
 I hope you are well.
 
@@ -464,15 +510,12 @@ If you have any questions regarding the appointment, please let us know.
 Kind Regards,`;
   }
 
-  // ── Build body HTML (for preview, with highlights) ──
+  // ── Build body HTML ──
   function buildBodyHTML() {
-    const tenantVal = plain(tenantInput.value);
-    const dateVal   = formatVisitDate(visitDateInput.value);
+    const dateVal = formatVisitDate(visitDateInput.value);
+    const dateH   = dateVal ? `<span class="highlight">${escHtml(dateVal)}</span>` : `<span class="empty-placeholder">[date not set]</span>`;
 
-    const tenantH = tenantVal ? `<span class="highlight">${escHtml(tenantVal)}</span>` : `<span class="empty-placeholder">[tenant name]</span>`;
-    const dateH   = dateVal   ? `<span class="highlight">${escHtml(dateVal)}</span>`   : `<span class="empty-placeholder">[date not set]</span>`;
-
-    return `Good afternoon ${tenantH},\n\nI hope you are well.\n\nAs instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${dateH} to collect water samples from your home in order to test the water supply for traces of lead.\n\nPlease could you advise if someone will be home on this date to provide access, or if our technician can access the property using keys from Cairn.\n\nPlease note that in order to carry out the lead test, pipes must not be used for at least 6 hours prior to our technician arriving to collect the water samples.\n\nIf you have any questions regarding the appointment, please let us know.\n\nKind Regards,`;
+    return `${greetingHTML()}\n\nI hope you are well.\n\nAs instructed by your letting agents, Cairn Letting, we're looking to arrange for a technician to visit your home on ${dateH} to collect water samples from your home in order to test the water supply for traces of lead.\n\nPlease could you advise if someone will be home on this date to provide access, or if our technician can access the property using keys from Cairn.\n\nPlease note that in order to carry out the lead test, pipes must not be used for at least 6 hours prior to our technician arriving to collect the water samples.\n\nIf you have any questions regarding the appointment, please let us know.\n\nKind Regards,`;
   }
 
   // ── Build admin note ──
@@ -492,25 +535,19 @@ Kind Regards,`;
 
   // ── Update ──
   function update() {
-    // To
     const toVal = plain(toInput.value);
     previewTo.innerHTML = toVal ? `<span class="highlight">${escHtml(toVal)}</span>` : '<span class="placeholder-text">—</span>';
 
-    // CC
     previewCc.innerHTML = ccEmails.length
       ? ccEmails.map(e => `<span class="highlight">${escHtml(e)}</span>`).join(' &nbsp;')
       : '<span class="placeholder-text">—</span>';
 
-    // Subject
     const propVal = plain(propertyInput.value);
     previewSubject.innerHTML = propVal
       ? `<span class="highlight">${escHtml(propVal)}</span> - Water Sample Collection - Cairn Letting`
       : 'Water Sample Collection - Cairn Letting';
 
-    // Body
     previewBody.innerHTML = buildBodyHTML();
-
-    // Admin note
     adminNote.innerHTML = buildAdminNoteHTML();
   }
 
