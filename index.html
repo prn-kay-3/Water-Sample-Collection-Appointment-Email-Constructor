@@ -449,7 +449,8 @@
     // If the pasted text contains line breaks, commas, or semicolons — treat as bulk paste
     if (/[\n\r,;]/.test(pasted)) {
       e.preventDefault();
-      const added = addEmailsFromText(pasted);
+      const cleaned = pasted.replace(/^['"\s]+|['"\s]+$/g, '');
+      const added = addEmailsFromText(cleaned);
       if (added > 0) showToast(`${added} email${added > 1 ? 's' : ''} added!`);
       ccInput.value = '';
     }
@@ -472,19 +473,28 @@
   }
 
   // ── Greeting helper ──
+  function timeOfDayGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
+
   // Returns plain-text greeting line
   function greetingPlain() {
     const tenantVal = plain(tenantInput.value);
-    return tenantVal ? `Good afternoon ${tenantVal},` : 'Hi there,';
+    const salutation = timeOfDayGreeting();
+    return tenantVal ? `${salutation} ${tenantVal},` : `${salutation},`;
   }
 
   // Returns HTML greeting line (with highlight if name present)
   function greetingHTML() {
     const tenantVal = plain(tenantInput.value);
+    const salutation = timeOfDayGreeting();
     if (tenantVal) {
-      return `Good afternoon <span class="highlight">${escHtml(tenantVal)}</span>,`;
+      return `${salutation} <span class="highlight">${escHtml(tenantVal)}</span>,`;
     }
-    return `Hi there,`;
+    return `${salutation},`;
   }
 
   // ── Build body plain ──
